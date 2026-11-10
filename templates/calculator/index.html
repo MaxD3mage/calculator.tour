@@ -1,0 +1,83 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ТурМир — калькулятор тура</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <header class="topbar"><div class="shell nav">
+    <a class="brand" href="/">Тур<span>Мир</span></a>
+    <nav><a href="#calculator">Калькулятор</a><a href="#how">Как это работает</a></nav>
+    <a class="nav-button" href="#calculator">Рассчитать тур <span>↗</span></a>
+  </div></header>
+  <main>
+    <section class="hero shell">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> Планируйте путешествие с уверенностью</div>
+        <h1>Ваш отдых.<br><em>Ваша цена.</em></h1>
+        <p>Соберите идеальный тур за пару минут — мы прозрачно покажем, из чего складывается стоимость.</p>
+        <a class="hero-link" href="#calculator">Начать расчёт <span>↓</span></a>
+      </div>
+      <div class="hero-art"><div class="sun"></div><div class="mountains"></div>
+        <div class="art-card"><strong>Ваше следующее<br>приключение</strong><small>начинается здесь</small></div>
+      </div>
+    </section>
+    <section class="calculator-section" id="calculator"><div class="shell">
+      <div class="section-heading"><div><div class="eyebrow">01 / Параметры путешествия</div><h2>Соберите свой тур</h2></div><span class="muted">Заполните форму — это займёт меньше минуты</span></div>
+      <div class="calculator-grid">
+        <form method="post" class="form-card">
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="errors">{{ form.non_field_errors }}</div>{% endif %}
+          <div class="form-grid">
+            <div class="field wide"><label>{{ form.destination.label }}</label>{{ form.destination }}</div>
+            <div class="field"><label>{{ form.departure.label }}</label>{{ form.departure }}</div>
+            <div class="field"><label>{{ form.departure_date.label }}</label>{{ form.departure_date }}</div>
+            <div class="field"><label>{{ form.nights.label }}</label>{{ form.nights }}</div>
+            <div class="field"><label>{{ form.hotel.label }}</label>{{ form.hotel }}</div>
+            <div class="field"><label>{{ form.meal.label }}</label>{{ form.meal }}</div>
+            <div class="field"><label>{{ form.adults.label }}</label>{{ form.adults }}</div>
+            <div class="field"><label>{{ form.children.label }}</label>{{ form.children }}</div>
+          </div>
+          <div class="options">
+            <label class="check">{{ form.transfer }}<span>Трансфер из аэропорта</span></label>
+            <label class="check">{{ form.insurance }}<span>Страховка путешественника</span></label>
+          </div>
+          {% if form.errors %}<div class="field-errors">Проверьте выделенные поля и попробуйте ещё раз.</div>{% endif %}
+          <button class="primary-button" type="submit">Рассчитать стоимость <span>→</span></button>
+        </form>
+        <aside class="result-card">
+          {% if result %}
+            <div class="result-label">02 / Ваш предварительный расчёт</div>
+            <div class="result-destination">{{ result.destination }}</div>
+            <div class="result-meta">{{ result.departure }} · {{ result.nights }} ночей · {{ result.travelers }} туристов</div>
+            <div class="total">{{ result.total|floatformat:0 }} <small>₽</small></div>
+            <div class="per-person">≈ {{ result.per_person_total|floatformat:0 }} ₽ на человека</div>
+            <div class="breakdown">
+              <div><span>Перелёт</span><strong>{{ result.flight|floatformat:0 }} ₽</strong></div>
+              <div><span>Проживание</span><strong>{{ result.accommodation|floatformat:0 }} ₽</strong></div>
+              <div><span>Питание</span><strong>{{ result.meals|floatformat:0 }} ₽</strong></div>
+              {% if result.transfer %}<div><span>Трансфер</span><strong>{{ result.transfer|floatformat:0 }} ₽</strong></div>{% endif %}
+              {% if result.insurance %}<div><span>Страховка</span><strong>{{ result.insurance|floatformat:0 }} ₽</strong></div>{% endif %}
+              <div class="accent"><span>{{ result.season_name }}</span><strong>{% if result.seasonal_adjustment > 0 %}+{% endif %}{{ result.seasonal_adjustment|floatformat:0 }} ₽</strong></div>
+              {% if result.group_discount %}<div class="discount"><span>Скидка за группу</span><strong>−{{ result.group_discount|floatformat:0 }} ₽</strong></div>{% endif %}
+            </div>
+            <p class="note">* Расчёт предварительный. Финальная стоимость зависит от наличия мест и актуальных тарифов.</p>
+          {% else %}
+            <div class="empty-result"><span class="empty-icon">✦</span><h3>Здесь появится<br>ваш расчёт</h3><p>Заполните параметры слева, и мы покажем подробную стоимость тура.</p></div>
+          {% endif %}
+        </aside>
+      </div>
+    </div></section>
+    <section class="how shell" id="how"><div class="eyebrow">Почему ТурМир</div><h2>Просто. Прозрачно. По-человечески.</h2>
+      <div class="benefits"><div><b>01</b><h3>Честная цена</h3><p>Видите каждую составляющую, без скрытых платежей.</p></div><div><b>02</b><h3>Умный расчёт</h3><p>Учитываем сезонность, состав группы и ваши пожелания.</p></div><div><b>03</b><h3>Готовы помочь</h3><p>Наши эксперты уточнят детали и подберут лучший вариант.</p></div></div>
+    </section>
+  </main>
+  <footer><div class="shell"><span class="brand">Тур<span>Мир</span></span><span>© 2026 · Путешествия начинаются здесь</span></div></footer>
+</body>
+</html>
